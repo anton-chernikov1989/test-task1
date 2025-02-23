@@ -1,3 +1,5 @@
+# ЗАДАНИЕ 1
+
 Следует учитывать что пользователей с подпиской и подтверждённым адресом электронной почты, согласно условиям задачи, около 150 000
 Если выделить по 30 секунд (средний случай) на проверку каждого адреса, валидация займет 75 000 минут или примерно 52 дня
 В связи с этим имеет смысл в первую очередь проверять электронные адреса тех пользователей, которым нужно отправить письмо в ближайшее время.
@@ -23,3 +25,40 @@
 
 # Соединение с БД
 `docker exec -itu1000 test_task_db mysql -uroot -proot --database=project`
+
+# ЗАДАНИЕ 2
+
+```
+WITH OrderStats AS (
+    SELECT
+        o.user_id,
+        SUM(CASE WHEN o.payed = true THEN 1 ELSE 0 END) AS paid_orders,
+        SUM(CASE WHEN o.payed = false THEN 1 ELSE 0 END) AS unpaid_orders
+    FROM orders o
+    GROUP BY o.user_id
+),
+PaymentStats AS (
+    SELECT
+        o.user_id,
+        COUNT(p.id) AS total_payments,
+        SUM(CASE WHEN p.status = 'failed' THEN 1 ELSE 0 END) AS failed_payments
+    FROM orders o
+    JOIN payments p ON o.id = p.order_id
+    GROUP BY o.user_id
+)
+SELECT u.*
+FROM users u
+JOIN OrderStats os ON u.id = os.user_id
+JOIN PaymentStats ps ON u.id = ps.user_id
+WHERE 
+    os.paid_orders > 2 * os.unpaid_orders
+    AND (ps.failed_payments * 1.0 / NULLIF(ps.total_payments, 0)) < 0.15;
+```
+
+# ЗАДАНИЕ 3
+1. Frontend (UI) – Интерфейс для пользователя (веб-приложение), где можно добавлять торрент-ссылки и отслеживать прогресс загрузки.
+1. API Gateway – Принимает запросы от клиента и направляет их в нужные сервисы.
+1. User Service – Обрабатывает данные о пользователях (регистрация, авторизация, тарифы).
+1. Torrent Service – Скачивает торренты и сохраняет их в облачное хранилище.
+1. Cloud Storage – Облачное хранилище для сохранения скачанных фильмов.
+1. Video Streaming – Сервис для потоковой передачи видео из облачного хранилища.
