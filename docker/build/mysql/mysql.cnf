@@ -1,0 +1,5 @@
+[mysqld]
+max_allowed_packet = 32M
+long_query_time = 2
+optimizer_switch='block_nested_loop=off'
+bind-address = 0.0.0.0

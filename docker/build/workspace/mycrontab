@@ -1,0 +1,4 @@
+0 1 * * * flock -n /tmp/email_enqueue.lock php /var/www/src/email_enqueue.php
+* * * * * flock -n /tmp/email_validity_enqueue.lock php /var/www/src/email_validity_enqueue.php
+* * * * * flock -n /tmp/email_check.lock php /var/www/src/email_check.php
+* * * * * flock -n /tmp/send_emails.lock php /var/www/src/send_emails.php

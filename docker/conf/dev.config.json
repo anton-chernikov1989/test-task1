@@ -1,0 +1,42 @@
+{
+  "listeners": {
+    "*:80": {
+      "pass": "routes"
+    }
+  },
+  "applications": {
+    "php_app": {
+      "type": "php",
+      "root": "/var/www/html/public",
+      "user": "root",
+      "script": "index.php",
+      "options": {
+        "file": "/etc/php/7.4/cli/php.ini",
+        "admin": {
+          "memory_limit": "256M",
+          "variables_order": "EGPCS",
+          "expose_php": "0",
+          "post_max_size": "20M",
+          "upload_max_filesize": "20M",
+          "max_file_uploads": "20",
+          "max_input_vars": "3000"
+        }
+      }
+    }
+  },
+  "routes": [
+    {
+      "match": {
+        "uri": ["/build/*"]
+      },
+      "action": {
+        "share": "/var/www/html/public/"
+      }
+    },
+    {
+      "action": {
+        "pass": "applications/php_app"
+      }
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+    workspace:
+        build:
+            context: ./build/workspace
+        stdin_open: true
+        tty: true
+        entrypoint: /bin/sh
+        environment:
+            USER: 0
+            GROUP: 0
+        volumes:
+            - ./../:/var/www
+            - /etc/localtime:/etc/localtime:ro
+            - /etc/timezone:/etc/timezone:ro
+        depends_on:
+            - db
+        networks:
+          - test_task_network
+        container_name: test_task_workspace
+    db:
+        build:
+            context: ./build/mysql
+        environment:
+            MYSQL_DATABASE: project
+            MYSQL_ROOT_PASSWORD: root
+        volumes:
+            - dbdata:/var/lib/mysql
+            - /etc/localtime:/etc/localtime:ro
+            - /etc/timezone:/etc/timezone:ro
+        networks:
+            - test_task_network
+        container_name: test_task_db
+
+volumes:
+    dbdata:
+
+networks:
+    test_task_network:
+        external: false
